@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="Part1" Id="{d92719f0-1ee3-4d47-8cbd-b1c9e3e22ccf}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM Part1
+VAR
+//Program Components
+	ProcessState : INT := 0;
+	CycleTrack : INT :=0;
+	HoldTime : TON;
+	ProcessStopped: BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[HoldTime(PT := T#1S );
+
+
+
+
+IF GVL_HMI.b_StopAuto THEN
+	ProcessStopped := TRUE;
+END_IF
+
+IF ProcessStopped THEN
+	GVL_Simulated.b_ConvPos := GVL_Simulated.b_ConvNeg := FALSE;
+	HoldTime.IN := FALSE;
+END_IF
+
+IF GVL_HMI.b_StartAuto THEN
+	ProcessStopped := FALSE;
+END_IF
+
+
+IF NOT ProcessStopped THEN
+	CASE ProcessState OF
+		0://MachineStop
+			GVL_Simulated.b_ConvPos := GVL_Simulated.b_ConvNeg := FALSE;
+			IF GVL_HMI.b_StartAuto THEN
+				ProcessState :=1;
+			END_IF
+		1://Positive Direction
+			GVL_Simulated.b_ConvPos := TRUE;
+			GVL_Simulated.b_ConvNeg := FALSE;
+			IF GVL_Simulated.b_Sensor4 THEN
+				ProcessState :=2;
+				CycleTrack := CycleTrack +1;
+			END_IF
+		2://Hold
+			GVL_Simulated.b_ConvPos := GVL_Simulated.b_ConvNeg := FALSE;
+			HoldTime.IN := TRUE;
+			IF HoldTime.Q THEN
+				HoldTime.IN := FALSE;
+				ProcessState :=3;
+			END_IF
+		3://Negative Direction
+			GVL_Simulated.b_ConvNeg := TRUE;
+			GVL_Simulated.b_ConvPos := FALSE;
+			IF GVL_Simulated.b_Sensor1 THEN
+				ProcessState :=4;
+				CycleTrack := CycleTrack +1;
+			END_IF
+		4://Hold
+			GVL_Simulated.b_ConvPos := GVL_Simulated.b_ConvNeg := FALSE;
+			HoldTime.IN := TRUE;
+			IF HoldTime.Q THEN
+				HoldTime.IN := FALSE;
+				ProcessState :=1;
+			END_IF
+		
+	END_CASE
+END_IF
+
+
+IF CycleTrack = 21 THEN
+	ProcessState := 0;
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

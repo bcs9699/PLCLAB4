@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="MAIN" Id="{3a9dacf3-edac-469c-b94b-870f261e6860}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR
+
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+AssignInsOuts();
+
+HMI_Functions();
+
+CASE GVL_HMI.ProgramSelect OF
+	1:
+		Part1();
+	2:
+		Part2();
+	3:
+		Part3();
+END_CASE
+
+
+
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

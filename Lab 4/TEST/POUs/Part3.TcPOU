@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="Part3" Id="{1b5c009c-162d-4cba-a3f5-3a24439f907f}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM Part3
+VAR
+//Program Components
+	ProcessState : INT := 0;
+	ProcessStopped: BOOL := FALSE;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+
+//Set Lights and Motors to Default Off
+GVL_Simulated.b_Emitter := GVL_Simulated.b_Remover := FALSE;
+GVL_Simulated.b_conv2_1 := GVL_Simulated.b_conv2_2 := GVL_Simulated.b_conv2_3 := FALSE;
+
+//Detects if Stop Button Pressed
+IF GVL_HMI.b_StopAuto THEN
+	ProcessStopped := TRUE;
+END_IF
+
+IF GVL_HMI.b_StartAuto THEN
+	ProcessStopped := FALSE;
+END_IF
+
+//State Machine
+IF NOT ProcessStopped THEN
+	CASE ProcessState OF
+		
+		0://Process Start
+			IF GVL_HMI.b_StartAuto THEN
+				ProcessState :=10;
+			END_IF
+		10:// Emit
+			GVL_Simulated.b_Emitter := TRUE;
+			IF  GVL_Simulated.b_Sensor2_1 THEN
+				ProcessState :=20;
+			END_IF
+			
+		20://1 to 2
+			GVL_Simulated.b_conv2_1 := TRUE;
+			GVL_Simulated.b_conv2_2 := TRUE;
+			IF GVL_Simulated.b_Sensor2_2 THEN
+				ProcessState :=30;
+			END_IF
+
+		30://2 to 3
+			GVL_Simulated.b_conv2_2 := TRUE;
+			GVL_Simulated.b_conv2_3 := TRUE;
+			IF GVL_Simulated.b_Sensor2_3 THEN
+				ProcessState :=40;
+			END_IF
+			
+			
+		40://3 to 4
+			GVL_Simulated.b_conv2_3 := TRUE;
+			IF GVL_Simulated.b_Sensor2_3 THEN
+				ProcessState :=50;
+			END_IF
+		50: //Remove Items
+			GVL_Simulated.b_Remover := TRUE;
+			IF NOT GVL_Simulated.b_Sensor2_3 THEN
+				ProcessState :=10;
+			END_IF
+	END_CASE
+END_IF
+
+
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

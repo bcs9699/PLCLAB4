@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="AssignInsOuts" Id="{870391c3-24f8-40b6-a2dd-62e50da89dd7}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM AssignInsOuts
+VAR
+	//Factory IO
+	FactoryIO_Ins : ARRAY [0..15] OF BYTE;
+	FactoryIO_Outs : ARRAY [0..15] OF BYTE;
+	FactoryIO_RegOuts : ARRAY [0..7] OF BYTE;
+	
+	//FIO Function Blocks
+	FB_FactoryIO_ReadInputs: FB_FactoryIO_ReadInputs_;
+	FB_FactoryIO_WriteOutputs: FB_FactoryIO_WriteOutputs;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//Reads Inputs and Writes Outputs to FactoryIO over TCP/IP
+FB_FactoryIO_ReadInputs();
+FB_FactoryIO_WriteOutputs();
+
+
+//Link Inputs from FactoryIO
+GVL_Simulated.b_Sensor1 := NOT FactoryIO_Ins [0].0;
+GVL_Simulated.b_Sensor2 := NOT FactoryIO_Ins [0].1;
+GVL_Simulated.b_Sensor3 := NOT FactoryIO_Ins [0].2;
+GVL_Simulated.b_Sensor4 := NOT FactoryIO_Ins [0].3;
+GVL_Simulated.b_Sensor2_1 := NOT FactoryIO_Ins [0].4;
+GVL_Simulated.b_Sensor2_2 := NOT FactoryIO_Ins [0].5;
+GVL_Simulated.b_Sensor2_3 := NOT FactoryIO_Ins [0].6;
+
+
+//Link Outputs to FactoryIO
+FactoryIO_Outs [0].0 := GVL_Simulated.b_convPos ;
+FactoryIO_Outs [0].1 := GVL_Simulated.b_convNeg ;
+FactoryIO_Outs [0].2 := GVL_Simulated.b_light1 ;
+FactoryIO_Outs [0].3 := GVL_Simulated.b_light2 ;
+FactoryIO_Outs [0].4 := GVL_Simulated.b_light3 ;
+FactoryIO_Outs [0].5 := GVL_Simulated.b_light4 ;
+FactoryIO_Outs [0].6 := GVL_Simulated.b_conv2_1 ;
+FactoryIO_Outs [0].7 := GVL_Simulated.b_conv2_2 ;
+FactoryIO_Outs [1].0 := GVL_Simulated.b_conv2_3 ;
+FactoryIO_Outs [1].1 := GVL_Simulated.b_Emitter ;
+FactoryIO_Outs [1].2 := GVL_Simulated.b_Remover ;
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

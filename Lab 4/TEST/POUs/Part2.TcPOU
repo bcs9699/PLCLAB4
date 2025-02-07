@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="Part2" Id="{5be88aec-12c3-48d7-ac0d-33e41d96f65a}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM Part2
+VAR
+	//Program Components
+	ProcessState : INT := 0;
+	CycleTrack : INT :=0;
+	HoldTime : TON;
+	ProcessStopped: BOOL := False;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//Initialize Hold Timer
+HoldTime(PT := T#3S );
+
+//Set Lights and Motors to Default Off
+gvl_simulated.b_Light1 := gvl_simulated.b_Light2 :=gvl_simulated.b_Light3 :=gvl_simulated.b_Light4 := FALSE;
+GVL_Simulated.b_ConvPos := GVL_Simulated.b_ConvNeg := FALSE;
+
+//Detects if Stop Button Pressed
+IF GVL_HMI.b_StopAuto THEN
+	ProcessStopped := TRUE;
+END_IF
+IF ProcessStopped THEN
+	HoldTime.IN := FALSE;
+END_IF
+IF GVL_HMI.b_StartAuto THEN
+	ProcessStopped := FALSE;
+END_IF
+
+//State Machine
+IF NOT ProcessStopped THEN
+	CASE ProcessState OF
+		
+		0://MachineStop
+			IF GVL_HMI.b_StartAuto THEN
+				ProcessState :=1;
+			END_IF
+			
+		1://1 to 2
+			GVL_Simulated.b_ConvPos := TRUE;
+			IF GVL_Simulated.b_Sensor2 THEN
+				ProcessState :=2;
+				CycleTrack := CycleTrack +1;
+			END_IF
+			
+		2://Hold 2
+			gvl_simulated.b_Light2 := TRUE;
+			HoldTime.IN := TRUE;
+			IF HoldTime.Q THEN
+				HoldTime.IN := FALSE;
+				ProcessState :=3;
+			END_IF
+			
+		3://2 to 3
+			GVL_Simulated.b_ConvPos := TRUE;
+			IF GVL_Simulated.b_Sensor3 THEN
+				ProcessState :=4;
+				CycleTrack := CycleTrack +1;
+			END_IF
+			
+		4://Hold 3
+			gvl_simulated.b_Light3 := TRUE;
+			HoldTime.IN := TRUE;
+			IF HoldTime.Q THEN
+				HoldTime.IN := FALSE;
+				ProcessState :=5;
+			END_IF
+			
+		5://3 to 4
+			GVL_Simulated.b_ConvPos := TRUE;
+			IF GVL_Simulated.b_Sensor4 THEN
+				ProcessState :=6;
+				CycleTrack := CycleTrack +1;
+			END_IF
+			
+		6://Hold 4
+			HoldTime.IN := TRUE;
+			gvl_simulated.b_Light4 := TRUE;
+			IF HoldTime.Q THEN
+				HoldTime.IN := FALSE;
+				ProcessState :=7;
+			END_IF
+			
+		7://4 to 3
+			GVL_Simulated.b_ConvNeg := TRUE;
+			IF GVL_Simulated.b_Sensor3 THEN
+				ProcessState :=8;
+				CycleTrack := CycleTrack +1;
+			END_IF
+			
+		8://Hold 3
+			HoldTime.IN := TRUE;
+			gvl_simulated.b_Light3 := TRUE;
+			IF HoldTime.Q THEN
+				HoldTime.IN := FALSE;
+				ProcessState :=9;
+			END_IF
+			
+		9://3 to 2
+			GVL_Simulated.b_ConvNeg := TRUE;
+			IF GVL_Simulated.b_Sensor2 THEN
+				ProcessState :=10;
+				CycleTrack := CycleTrack +1;
+			END_IF
+			
+		10://Hold 2
+			HoldTime.IN := TRUE;
+			gvl_simulated.b_Light2 := TRUE;
+			IF HoldTime.Q THEN
+				HoldTime.IN := FALSE;
+				ProcessState :=11;
+			END_IF
+			
+		11://2 to 1
+			GVL_Simulated.b_ConvNeg := TRUE;
+			IF GVL_Simulated.b_Sensor1 THEN
+				ProcessState :=12;
+				CycleTrack := CycleTrack +1;
+			END_IF
+			
+		12://Hold 1
+			HoldTime.IN := TRUE;
+			gvl_simulated.b_Light1 := TRUE;
+			IF HoldTime.Q THEN
+				HoldTime.IN := FALSE;
+				ProcessState :=1;
+			END_IF
+			
+	END_CASE
+	
+END_IF
+
+
+
+(*
+IF CycleTrack = 21 THEN
+	ProcessState := 0;
+END_IF
+*)]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

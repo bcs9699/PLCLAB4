@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FB_FactoryIO_WriteOutputs" Id="{d188ef50-d9a7-4c4d-951c-6cad16f1fc76}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_FactoryIO_WriteOutputs
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	FactoryIO_WriteOutsFB : FB_MBWriteCoils;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[FactoryIO_WriteOutsFB(
+	sIPAddr:= '127.0.0.1', 
+	nTCPPort:= 75, 
+	nUnitID:= 1, 
+	nQuantity:= 16, 
+	nMBAddr:= 0, 
+	cbLength:= SIZEOF(AssignInsOuts.FactoryIO_Outs), 
+	pSrcAddr:= ADR(AssignInsOuts.FactoryIO_Outs), 
+	bExecute:= TRUE, 
+	tTimeout:= T#1S, 
+	bBusy=> , 
+	bError=> , 
+	nErrId=> );
+	
+	FactoryIO_WriteOutsFB(bExecute:=FALSE);
+	]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <GVL Name="GVL_Simulated" Id="{40f1612b-1929-4c5f-921e-e3067f155a82}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+	//FIO Inputs
+	b_Sensor1 : BOOL;
+	b_Sensor2 : BOOL;
+	b_Sensor3 : BOOL;
+	b_Sensor4 : BOOL;
+	b_Sensor2_1 : BOOL;
+	b_Sensor2_2 : BOOL;
+	b_Sensor2_3 : BOOL;
+//FIO Outputs
+	b_ConvPos : BOOL;
+	b_ConvNeg : BOOL;
+	b_Light1 : BOOL;
+	b_Light2 : BOOL;
+	b_Light3 : BOOL;
+	b_Light4 : BOOL;
+	b_conv2_1 : BOOL;
+	b_conv2_2 : BOOL;
+	b_conv2_3 : BOOL;
+	b_Emitter : BOOL;
+	b_Remover : BOOL;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

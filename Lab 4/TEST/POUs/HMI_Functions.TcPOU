@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="HMI_Functions" Id="{61f64927-4129-47c6-850f-b4e2b9afb856}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM HMI_Functions
+VAR
+	PointLeft : STRING := 'Visible';
+	PointRight : STRING := 'Visible';
+	RightBox : STRING := 'Visible';
+	LeftBox : STRING := 'Visible';
+	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+//Programs Box direction layout on HMI Control Screen
+CASE Part1.ProcessState OF
+	0://MachineStop
+		PointLeft := 'Hidden';
+		PointRight := 'Hidden';
+		RightBox := 'Hidden';
+		LeftBox := 'Hidden';
+	1://Positive Direction
+		PointLeft := 'Hidden';
+		PointRight := 'Visible';
+		RightBox := 'Hidden';
+		LeftBox := 'Hidden';
+	2://Hold
+		PointLeft := 'Hidden';
+		PointRight := 'Hidden';
+		RightBox := 'Visible';
+		LeftBox := 'Hidden';
+	3://Negative Direction
+		PointLeft := 'Visible';
+		PointRight := 'Hidden';
+		RightBox := 'Hidden';
+		LeftBox := 'Hidden';
+	4://Hold
+		PointLeft := 'Hidden';
+		PointRight := 'Hidden';
+		RightBox := 'Hidden';
+		LeftBox := 'Visible';
+	
+END_CASE]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>
